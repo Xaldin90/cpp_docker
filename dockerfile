@@ -1,9 +1,10 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get install -y openssh-server apache2 git libapache2-mod-php7.0 g++ libssl-dev openssl software-properties-common
+RUN apt-get update && apt-get install -y openssh-server apache2 git libapache2-mod-php7.0 libssl-dev openssl software-properties-common
+RUN apt-get install -y g++
 # SSH stuff
 RUN mkdir /var/run/sshd
-RUN echo 'root:q5*1A3n?' | chpasswd
+RUN echo 'root:123456789' | chpasswd
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # SSH login fix. Otherwise user is kicked off after login
