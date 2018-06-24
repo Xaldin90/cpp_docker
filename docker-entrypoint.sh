@@ -6,7 +6,6 @@ cd /tmp/
 git clone https://github.com/Xaldin90/ctf_cpp.git
 cd /tmp/ctf_cpp/src
 
-g++ -std=c++11 abc.cpp -o crypt0 -lssl -lcrypto
 cd /
 
 #user anlegen
@@ -26,14 +25,22 @@ mkdir -p /var/ctf3_jail/usr/bin
 mkdir -p /var/ctf3_jail/usr/lib
 mkdir -p /var/ctf3_jail/lib/x86_64-linux-gnu
 mkdir -p /var/ctf3_jail/usr/lib/x86_64-linux-gnu
+mkdir -p /var/ctf3_jail/usr/share
 mkdir -p /var/ctf3_jail/usr/local
 mkdir -p /var/ctf3_jail/home
 chown root:root /var/ctf3_jail #base directory owned by root
 #chmod 0755 /var/ctf3_jail keiner außer root darf ich schreiben
 
 #copy crypt0 to new home
-mv /tmp/ctf_cpp/src/crypt0 /var/ctf3_jail/home
-rm -rf /tmp/ctf_cpp
+mv /tmp/ctf_cpp/ /var/ctf3_jail/home
+cd /var/ctf3_jail/home/ctf_cpp/src/
+mv crypt0.cpp /var/ctf3_jail/home/
+mv base64.h /var/ctf3_jail/home/
+mv comparePw /var/ctf3_jail/home/
+cd /var/ctf3_jail/home/
+g++ -std=c++11 -g crypt0.cpp -o crypt0 -lssl -lcrypto
+rm base64.h
+rm -rf ctf_cpp/
 
 #create the /dev files:
 mknod -m 666 /var/ctf3_jail/dev/null c 1 3
@@ -64,26 +71,6 @@ cp /bin/sh .
 #copy needed libs
 #cd /var/ctf3_jail/lib/x86_64-linux-gnu
 cp -a /lib/x86_64-linux-gnu/. /var/ctf3_jail/lib/x86_64-linux-gnu # copy all
-#cp /lib/x86_64-linux-gnu/libselinux.so.1 . #ls
-#cp /lib/x86_64-linux-gnu/libc.so.6 . #ls
-#cp /lib/x86_64-linux-gnu/libpcre.so.3 . #s
-#cp /lib/x86_64-linux-gnu/libdl.so.2 . #ls
-#cp /lib/x86_64-linux-gnu/libpthread.so.0 . #ls
-#cp /lib/x86_64-linux-gnu/libc.so.6 . #sh
-#cp /lib/x86_64-linux-gnu/libreadline.so.6 . #gdb
-#cp /lib/x86_64-linux-gnu/libz.so.1 . #gdb
-#cp /lib/x86_64-linux-gnu/libdl.so.2 . #gdb
-#cp /lib/x86_64-linux-gnu/libncurses.so.5 . #gdb
-#cp /lib/x86_64-linux-gnu/libtinfo.so.5 . #gdb
-#cp /lib/x86_64-linux-gnu/libm.so.6 . #gdb
-#cp /lib/x86_64-linux-gnu/libpthread.so.0 . #gdb
-#cp /lib/x86_64-linux-gnu/libexpat.so.1 . #gdb
-#cp /lib/x86_64-linux-gnu/liblzma.so.5 . #gdb
-#cp /lib/x86_64-linux-gnu/libc.so.6 . #gdb
-#cp /lib/x86_64-linux-gnu/libutil.so.1 . #gdb
-#cp /lib/x86_64-linux-gnu/libglib-2.0.so.0 . #gdb
-#cp /lib/x86_64-linux-gnu/libuuid.so.1 . #gdb
-#cp /lib/x86_64-linux-gnu/libpcre.so.3 . #gdb
 
 cd /var/ctf3_jail/lib64
 cp /lib64/ld-linux-x86-64.so.2 . #ls
@@ -92,16 +79,34 @@ cp /lib64/ld-linux-x86-64.so.2 . #ls
 
 #cd /var/ctf3_jail/usr/lib/x86_64-linux-gnu
 cp -a /usr/lib/x86_64-linux-gnu/. /var/ctf3_jail/usr/lib/x86_64-linux-gnu #copy all
-#cp /usr/lib/x86_64-linux-gnu/libbabeltrace-ctf.so.1 . #gdb
-#cp /usr/lib/x86_64-linux-gnu/libpython3.5m.so.1.0 . #gdb
-#cp /usr/lib/x86_64-linux-gnu/libbabeltrace.so.1 . #gdb
+
+# python stuff for gdb
+cp -r /usr/share/py* /var/ctf3_jail/usr/share/
+cp -r /usr/lib/py* /var/ctf3_jail/usr/lib/
+
+# vi stuff
+cp -r /usr/bin/vim.basic /var/ctf3_jail/usr/bin/
+cd /var/ctf3_jail/usr/bin/
+ln -s vim.basic ./vi
+
+# flag stuff
+mkdir /var/ctf3_jail/home/flag/
+mv /var/ctf3_jail/home/comparePw /var/ctf3_jail/home/flag/
+cd /var/ctf3_jail/home/flag
+#echo '3d4544546d687a645452474e744a4453' > comparePw
+echo 'SJgGRQ>P!-2){h}=' > passwd
+chown -R winner /var/ctf3_jail/home/flag/
+chmod 500 /var/ctf3_jail/home/flag/
+chmod 400 /var/ctf3_jail/home/flag/comparePw
+chmod 400 /var/ctf3_jail/home/flag/passwd
+
 
 #cd /var/ctf3_jail/usr/local
 cp -a /usr/local/. /var/ctf3_jail/usr/local #für gdb 
 rm -rf /var/ctf3_jail/usr/local/bin/docker-entrypoint.sh
 
 #berechtigungen anpassen
-#chattr +i /var/ctf3_jail/home/crypt0 #immutable machen geht nicht man braucht sudo
+ chattr +i /var/ctf3_jail/home/crypt0 #immutable machen geht nicht man braucht sudo
 chown winner:ctf /var/ctf3_jail/home/crypt0
 chmod 4550 /var/ctf3_jail/home/crypt0
 
@@ -128,6 +133,10 @@ cd /etc/ssh/
 #STR=$'\nMatch user ctf3\nPasswordAuthentication yes\nChrootDirectory /var/ctf3_jail'
 #echo STR >> sshd_config 
 echo 'Match user ctf3' >> sshd_config
+echo 'PasswordAuthentication yes' >> sshd_config
+echo 'ChrootDirectory /var/ctf3_jail' >> sshd_config
+
+echo 'Match user winner' >> sshd_config
 echo 'PasswordAuthentication yes' >> sshd_config
 echo 'ChrootDirectory /var/ctf3_jail' >> sshd_config
 
