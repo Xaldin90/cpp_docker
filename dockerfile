@@ -1,7 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get install -y openssh-server apache2 git libapache2-mod-php7.0 libssl-dev openssl software-properties-common
-RUN apt-get install -y g++
+RUN apt-get update && apt-get install -y git openssh-server libssl-dev openssl software-properties-common g++ libc6-dbg gdb valgrind nano
 # SSH stuff
 RUN mkdir /var/run/sshd
 RUN echo 'root:123456789' | chpasswd
@@ -15,9 +14,9 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 
 EXPOSE 22:22
 
-RUN ls
-
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh / # backwards compat
+
+
 
 CMD ["/docker-entrypoint.sh"]
