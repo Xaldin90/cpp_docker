@@ -15,7 +15,7 @@ groupadd ctf
 usermod -a -G ctf ctf3 #user gruppe zuweisen
 
 useradd winner #winner user anlegen
-echo 'winner:winner' | chpasswd
+echo 'winner:7T6hO29v' | chpasswd
 usermod -a -G ctf winner
 
 #create some bare minimum directores
