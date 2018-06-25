@@ -87,7 +87,7 @@ cp -r /usr/lib/py* /var/ctf3_jail/usr/lib/
 # vi stuff
 cp -r /usr/bin/vim.basic /var/ctf3_jail/usr/bin/
 cd /var/ctf3_jail/usr/bin/
-ln -s vim.basic ./vi
+#ln -s vim.basic ./vi #symbolic link doesnt work in ctf env
 
 # flag stuff
 mkdir /var/ctf3_jail/home/flag/
