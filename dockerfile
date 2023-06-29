@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:xenial-20210416
 
 RUN apt-get update && apt-get install -y git openssh-server libssl-dev openssl software-properties-common g++ libc6-dbg gdb valgrind vim
 # SSH stuff
